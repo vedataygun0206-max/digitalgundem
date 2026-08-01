@@ -355,7 +355,7 @@ height:260px;
 <div class="breaking">
 
 <span>
-
+  
 SON DAKİKA • Türkiye gündemi • Ekonomi • Spor • Teknoloji • Dünya • Cide Haberleri • Tarafsız bakar, doğruyu yayınlar.
 
 </span>
@@ -435,9 +435,7 @@ placeholder="Haber ara...">
 Türkiye'nin Dijital Haber Platformu Yayında
 </h1>
 
-<p>
-
-Digital Gündem;
+<p>Digital Gündem;
 Türkiye'nin 81 ilinden,
 ilçelerinden,
 köylerinden ve mahallelerinden
@@ -526,9 +524,7 @@ Bitcoin
 📢 WhatsApp İhbar Hattı
 </h3>
 
-<p>
-
-Vatandaş gazeteciliğini destekliyoruz.
+<p>Vatandaş gazeteciliğini destekliyoruz.
 
 Fotoğraf,
 video ve haber ihbarlarınızı
@@ -550,9 +546,7 @@ WhatsApp üzerinden bize ulaştırabilirsiniz.
 
 <h2>🇹🇷 Türkiye</h2>
 
-<p>
-
-Türkiye'nin dört bir yanından son dakika gelişmeleri,
+<p>Türkiye'nin dört bir yanından son dakika gelişmeleri,
 gündem haberleri ve özel dosyalar.
 
 </p>
@@ -1248,230 +1242,7 @@ setInterval(saatGoster,1000);
 
 saatGoster();
 
-</script>// Yukarı Çık Butonu
-const yukariButon = document.createElement("button");
-
-yukariButon.innerHTML = "⬆";
-
-yukariButon.style.position = "fixed";
-yukariButon.style.bottom = "20px";
-yukariButon.style.right = "20px";
-yukariButon.style.width = "50px";
-yukariButon.style.height = "50px";
-yukariButon.style.border = "none";
-yukariButon.style.borderRadius = "50%";
-yukariButon.style.background = "#d40000";
-yukariButon.style.color = "#fff";
-yukariButon.style.fontSize = "22px";
-yukariButon.style.cursor = "pointer";
-yukariButon.style.display = "none";
-yukariButon.style.zIndex = "99999";
-
-document.body.appendChild(yukariButon);
-
-window.addEventListener("scroll", () => {
-
-if(window.scrollY > 300){
-
-yukariButon.style.display="block";
-
-}else{
-
-yukariButon.style.display="none";
-
-}
-
-});
-
-yukariButon.onclick=function(){
-
-window.scrollTo({
-
-top:0,
-
-behavior:"smooth"
-
-});
-
-};
-
-// Haber Arama
-const haberKutulari=document.querySelectorAll(".card");
-
-const arama=document.querySelector(".search input");
-
-if(arama){
-
-arama.addEventListener("keyup",function(){
-
-const kelime=this.value.toLowerCase();
-
-haberKutulari.forEach(function(kart){
-
-kart.style.display=
-
-kart.innerText.toLowerCase().includes(kelime)
-
-?
-
-"block"
-
-:
-
-"none";
-
-});
-
-});
-
-}
-
-// Sayfa Animasyonu
-
-const kutular=document.querySelectorAll(".card,.sideCard,.mainNews");
-
-const gozlem=new IntersectionObserver((entries)=>{
-
-entries.forEach(entry=>{
-
-if(entry.isIntersecting){
-
-entry.target.style.opacity="1";
-
-entry.target.style.transform="translateY(0)";
-
-}
-
-});
-
-});
-
-kutular.forEach(k=>{
-
-k.style.opacity="0";
-
-k.style.transform="translateY(40px)";
-
-k.style.transition=".6s";
-
-gozlem.observe(k);
-
-});// Karanlık Mod
-const temaButonu = document.createElement("button");
-
-temaButonu.innerHTML = "🌙";
-
-temaButonu.style.position = "fixed";
-temaButonu.style.bottom = "80px";
-temaButonu.style.right = "20px";
-temaButonu.style.width = "50px";
-temaButonu.style.height = "50px";
-temaButonu.style.border = "none";
-temaButonu.style.borderRadius = "50%";
-temaButonu.style.background = "#111";
-temaButonu.style.color = "#fff";
-temaButonu.style.fontSize = "20px";
-temaButonu.style.cursor = "pointer";
-temaButonu.style.zIndex = "99999";
-
-document.body.appendChild(temaButonu);
-
-let koyuMod = false;
-
-temaButonu.onclick = function () {
-
-    koyuMod = !koyuMod;
-
-    if (koyuMod) {
-
-        document.body.style.background = "#111";
-        document.body.style.color = "#fff";
-
-        document.querySelectorAll(".card,.sideCard,.mainNews,header")
-        .forEach(function(k){
-
-            k.style.background="#1f1f1f";
-            k.style.color="#fff";
-
-        });
-
-        temaButonu.innerHTML="☀";
-
-    } else {
-
-        document.body.style.background="#f2f4f8";
-        document.body.style.color="#222";
-
-        document.querySelectorAll(".card,.sideCard,.mainNews,header")
-        .forEach(function(k){
-
-            k.style.background="#fff";
-            k.style.color="#222";
-
-        });
-
-        temaButonu.innerHTML="🌙";
-
-    }
-
-};
-
-// Basit Mobil Menü
-const menu = document.querySelector("nav");
-
-const menuButon = document.createElement("button");
-
-menuButon.innerHTML="☰";
-
-menuButon.style.display="none";
-menuButon.style.fontSize="28px";
-menuButon.style.background="transparent";
-menuButon.style.border="0";
-menuButon.style.cursor="pointer";
-
-document.querySelector(".header").prepend(menuButon);
-
-function mobilKontrol(){
-
-    if(window.innerWidth<900){
-
-        menu.style.display="none";
-        menuButon.style.display="block";
-
-    }else{
-
-        menu.style.display="block";
-        menuButon.style.display="none";
-
-    }
-
-}
-
-mobilKontrol();
-
-window.onresize=mobilKontrol;
-
-menuButon.onclick=function(){
-
-    if(menu.style.display=="none"){
-
-        menu.style.display="block";
-
-    }else{
-
-        menu.style.display="none";
-
-    }
-
-};
-
-// Telif yılı
-const yil = new Date().getFullYear();
-
-document.querySelector("footer div").innerHTML =
-document.querySelector("footer div").innerHTML.replace("2026",yil);
-
-console.log("Digital Gündem hazır.");</script>
+</script>
 
 </body>
 
