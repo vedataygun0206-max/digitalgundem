@@ -32,6 +32,18 @@ font-family:'Poppins',sans-serif;
 }
 
 body{
+  <nav class="menu">
+<a href="#">🏠 Ana Sayfa</a>
+<a href="#">Son Dakika</a>
+<a href="#">Türkiye</a>
+<a href="#">Yerel</a>
+<a href="#">Ekonomi</a>
+<a href="#">Spor</a>
+<a href="#">Teknoloji</a>
+<a href="#">Dünya</a>
+<a href="#">Sağlık</a>
+<a href="#">Cide</a>
+</nav>
 background:#f2f4f8;
 color:#222;
 }
@@ -350,7 +362,24 @@ height:260px;
 }
 
 }
+.menu{
+display:flex;
+overflow-x:auto;
+background:#b30000;
+white-space:nowrap;
+}
 
+.menu a{
+color:#fff;
+padding:14px 18px;
+text-decoration:none;
+font-weight:600;
+flex-shrink:0;
+}
+
+.menu a:hover{
+background:#8d0000;
+}
 </style>
 
 </head>
