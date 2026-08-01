@@ -1,6 +1,1479 @@
-export default { async fetch(request){ const url=new URL(request.url); if(!globalThis.DB)globalThis.DB=[{id:1,t:"Turkiye Dijital Donusumde Hiz Kesmiyor",c:"GUNDEM",time:"2 saat once",img:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800",txt:"digitalgundem olarak 81 ilden haberleri anlik takip ediyoruz."}]; let db=globalThis.DB;
-if(url.pathname==="/api/news"){try{let r=await fetch("https://www.trthaber.com/sondakika_articles.rss");let t=await r.text();let m=[...t.matchAll(/<title><!\[CDATA\[(.*?)\]\]><\/title>/g)].slice(1,6).map(x=>x[1]);m.forEach((x,i)=>{if(!db.find(d=>d.t===x))db.unshift({id:Date.now()+i,t:x,c:"GUNDEM",time:"Az once",img:"https://picsum.photos/seed/"+(Date.now()+i)+"/800/450",txt:x})})}catch(e){} return new Response(JSON.stringify(db),{headers:{"Content-Type":"application/json","Access-Control-Allow-Origin":"*"}})}
-if(url.pathname==="/admin"){return new Response(`<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>digitalgundem admin</title><style>body{font-family:sans-serif;background:#0f172a;color:#fff;padding:20px}input,textarea,select{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #334155;background:#1e293b;color:#fff}button{background:#dc2626;color:#fff;border:0;padding:12px;border-radius:8px;font-weight:800;width:100%;cursor:pointer}.b{max-width:600px;margin:auto}</style><div class=b><h1>digitalgundem admin</h1><div id=l><input id=p type=password placeholder="Sifre: digital2026"><button onclick="if(document.getElementById('p').value==='digital2026'){l.style.display='none';pn.style.display='block';load()}else alert('yanlis')">Giris</button></div><div id=pn style=display:none><input id=tt placeholder=Baslik><select id=cc><option>GUNDEM<option>EKONOMI<option>SPOR<option>TEKNOLOJI</select><input id=ii placeholder="Resim URL"><textarea id=ct placeholder=Icerik></textarea><button onclick="add()">YAYINLA</button><button onclick="fetch('/api/news').then(()=>{alert('cekildi');load()})" style=background:#16a34a>Otomatik Gundem Cek</button><div id=ll style=margin-top:20px></div><br><a href=/ style=color:#94a3b8>Siteye Don</a></div></div><script>async function load(){let r=await fetch('/api/news');let d=await r.json();ll.innerHTML=d.map(x=>'<div style=background:#1e293b;padding:10px;border-radius:8px;margin:6px 0>'+x.t.slice(0,60)+'<button onclick=del('+x.id+') style=width:auto;background:#334155;padding:4px 10px;float:right>Sil</button></div>').join('')}async function add(){await fetch('/api/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pass:'digital2026',title:tt.value,cat:cc.value,img:ii.value,content:ct.value})});alert('yayinlandi');load()}async function del(id){await fetch('/api/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pass:'digital2026',id})});load()}load()<\/script>`,{headers:{"Content-Type":"text/html;charset=utf-8"}})}
-if(url.pathname==="/api/add"&&request.method==="POST"){let b=await request.json();if(b.pass!=="digital2026")return new Response("no",{status:401});db.unshift({id:Date.now(),t:b.title,c:b.cat,time:"Simdi",img:b.img||"https://picsum.photos/seed/"+Date.now()+"/800/450",txt:b.content});return new Response(JSON.stringify({ok:1}))}
-if(url.pathname==="/api/delete"&&request.method==="POST"){let b=await request.json();if(b.pass!=="digital2026")return new Response("no",{status:401});globalThis.DB=db.filter(x=>x.id!==b.id);return new Response(JSON.stringify({ok:1}))}
-let main=db[0];let side=db.slice(1);return new Response(`<!doctype html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>digitalgundem</title><style>*{margin:0;box-sizing:border-box}body{font-family:system-ui;background:#f8fafc;color:#0f172a}.top{background:#dc2626;color:#fff;text-align:center;padding:8px;font-weight:800;font-size:13px}header{background:#0f172a;color:#fff;padding:14px}.c{max-width:1280px;margin:auto;padding:0 12px;display:flex;justify-content:space-between}.logo{font-weight:900;font-size:22px}.w{max-width:1280px;margin:16px auto;padding:0 12px;display:grid;grid-template-columns:2fr 1fr;gap:14px}@media(max-width:800px){.w{grid-template-columns:1fr}}.m{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.07)}.m img{width:100%;height:320px;object-fit:cover}.p{padding:18px}.badge{background:#dc2626;color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}.card{background:#fff;border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.07);margin-bottom:12px}</style></head><body><div class=top>digitalgundem canli - admin panel aktif</div><header><div class=c><div class=logo>digitalgundem</div><div><a href=/ style=color:#cbd5e1;text-decoration:none;margin-right:12px>GUNDEM</a><a href=/admin style=background:#dc2626;padding:6px 12px;border-radius
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Digital Gündem | Tarafsız bakar, doğruyu yayınlar.</title>
+
+<meta name="description" content="Digital Gündem - Türkiye'nin yeni dijital haber platformu. Son dakika, ekonomi, spor, teknoloji, dünya ve yerel haberler.">
+
+<meta name="keywords" content="haber, son dakika, digital gündem, türkiye, cide, kastamonu, ekonomi, spor, teknoloji">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
+
+body{
+background:#f2f4f8;
+color:#222;
+}
+
+a{
+text-decoration:none;
+color:inherit;
+}
+
+img{
+max-width:100%;
+display:block;
+}
+
+.topbar{
+background:#d40000;
+color:#fff;
+padding:8px 15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:14px;
+}
+
+.breaking{
+white-space:nowrap;
+overflow:hidden;
+}
+
+.breaking span{
+display:inline-block;
+padding-left:100%;
+animation:kayan 18s linear infinite;
+}
+
+@keyframes kayan{
+
+0%{
+transform:translateX(0);
+}
+
+100%{
+transform:translateX(-100%);
+}
+
+}
+
+header{
+background:#fff;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+padding:15px;
+position:sticky;
+top:0;
+z-index:999;
+}
+
+.header{
+max-width:1400px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-size:34px;
+font-weight:700;
+color:#d40000;
+}
+
+.logo span{
+color:#111;
+}
+
+.slogan{
+font-size:13px;
+color:#777;
+}
+
+nav ul{
+display:flex;
+list-style:none;
+gap:18px;
+}
+
+nav li{
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+nav li:hover{
+color:#d40000;
+}
+
+.search input{
+padding:10px;
+border:1px solid #ddd;
+border-radius:30px;
+width:220px;
+outline:none;
+}
+
+.hero{
+
+max-width:1400px;
+margin:25px auto;
+
+display:grid;
+grid-template-columns:2fr 1fr;
+
+gap:20px;
+
+padding:0 15px;
+
+}
+
+.mainNews{
+
+background:#fff;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.mainNews img{
+
+height:430px;
+
+object-fit:cover;
+
+width:100%;
+
+}
+
+.mainContent{
+
+padding:20px;
+
+}
+
+.mainContent h1{
+
+font-size:34px;
+
+margin-bottom:15px;
+
+}
+
+.mainContent p{
+
+line-height:1.8;
+
+color:#555;
+
+}
+
+.sidebar{
+
+display:flex;
+
+flex-direction:column;
+
+gap:20px;
+
+}
+
+.sideCard{
+
+background:#fff;
+
+padding:15px;
+
+border-radius:12px;
+
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+.sideCard h3{
+
+margin-bottom:15px;
+
+color:#d40000;
+
+}
+
+.sideNews{
+
+padding:10px 0;
+
+border-bottom:1px solid #eee;
+
+font-size:15px;
+
+}
+
+.categories{
+
+max-width:1400px;
+
+margin:auto;
+
+padding:20px 15px;
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+gap:20px;
+
+}
+
+.card{
+
+background:#fff;
+
+border-radius:12px;
+
+overflow:hidden;
+
+box-shadow:0 3px 12px rgba(0,0,0,.08);
+
+transition:.3s;
+
+}
+
+.card:hover{
+
+transform:translateY(-6px);
+
+}
+
+.card img{
+
+height:180px;
+
+object-fit:cover;
+
+width:100%;
+
+}
+
+.cardContent{
+
+padding:15px;
+
+}
+
+.cardContent h2{
+
+font-size:20px;
+
+margin-bottom:10px;
+
+}
+
+.cardContent p{
+
+font-size:14px;
+
+color:#666;
+
+line-height:1.7;
+
+}
+
+footer{
+
+margin-top:40px;
+
+background:#111;
+
+color:#fff;
+
+padding:40px;
+
+text-align:center;
+
+}
+
+@media(max-width:900px){
+
+.hero{
+
+grid-template-columns:1fr;
+
+}
+
+nav{
+
+display:none;
+
+}
+
+.search{
+
+display:none;
+
+}
+
+.logo{
+
+font-size:28px;
+
+}
+
+.mainNews img{
+
+height:260px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="topbar">
+
+<div>📢 Digital Gündem</div>
+
+<div class="breaking">
+
+<span>
+
+SON DAKİKA • Türkiye gündemi • Ekonomi • Spor • Teknoloji • Dünya • Cide Haberleri • Tarafsız bakar, doğruyu yayınlar.
+
+</span>
+
+</div>
+
+</div>
+  <header>
+
+<div class="header">
+
+<div>
+
+<div class="logo">
+Digital <span>Gündem</span>
+</div>
+
+<div class="slogan">
+Tarafsız bakar, doğruyu yayınlar.
+</div>
+
+</div>
+
+<nav>
+
+<ul>
+
+<li>Anasayfa</li>
+
+<li>Son Dakika</li>
+
+<li>Gündem</li>
+
+<li>Türkiye</li>
+
+<li>Ekonomi</li>
+
+<li>Spor</li>
+
+<li>Teknoloji</li>
+
+<li>Dünya</li>
+
+<li>Sağlık</li>
+
+<li>Video</li>
+
+<li>Foto Galeri</li>
+
+<li>Cide</li>
+
+</ul>
+
+</nav>
+
+<div class="search">
+
+<input
+type="text"
+placeholder="Haber ara...">
+
+</div>
+
+</div>
+
+</header>
+
+<section class="hero">
+
+<div class="mainNews">
+
+<img src="https://picsum.photos/1200/700?news" alt="Manşet Haber">
+
+<div class="mainContent">
+
+<h1>
+Türkiye'nin Dijital Haber Platformu Yayında
+</h1>
+
+<p>
+
+Digital Gündem;
+Türkiye'nin 81 ilinden,
+ilçelerinden,
+köylerinden ve mahallelerinden
+gelen gelişmeleri
+tek platformda buluşturmayı hedefleyen
+yeni nesil dijital haber sitesidir.
+
+</p>
+
+<p style="margin-top:15px;">
+
+Gündem,
+ekonomi,
+spor,
+teknoloji,
+sağlık,
+dünya,
+kültür sanat,
+yerel haberler
+ve son dakika gelişmeleri
+anlık olarak yayınlanacaktır.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="sidebar">
+
+<div class="sideCard">
+
+<h3>
+🔥 Son Dakika
+</h3>
+
+<div class="sideNews">
+▶ İstanbul'da son gelişmeler...
+</div>
+
+<div class="sideNews">
+▶ Cide'den sıcak haberler...
+</div>
+
+<div class="sideNews">
+▶ Ekonomi gündeminde son durum...
+</div>
+
+<div class="sideNews">
+▶ Spor dünyasında flaş gelişme...
+</div>
+
+<div class="sideNews">
+▶ Teknoloji haberleri...
+</div>
+
+</div>
+
+<div class="sideCard">
+
+<h3>
+📊 Piyasalar
+</h3>
+
+<div class="sideNews">
+Gram Altın
+</div>
+
+<div class="sideNews">
+Dolar / Euro
+</div>
+
+<div class="sideNews">
+Borsa İstanbul
+</div>
+
+<div class="sideNews">
+Bitcoin
+</div>
+
+</div>
+
+<div class="sideCard">
+
+<h3>
+📢 WhatsApp İhbar Hattı
+</h3>
+
+<p>
+
+Vatandaş gazeteciliğini destekliyoruz.
+
+Fotoğraf,
+video ve haber ihbarlarınızı
+WhatsApp üzerinden bize ulaştırabilirsiniz.
+
+</p>
+
+</div>
+
+</div>
+
+</section><section class="categories">
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?turkey">
+
+<div class="cardContent">
+
+<h2>🇹🇷 Türkiye</h2>
+
+<p>
+
+Türkiye'nin dört bir yanından son dakika gelişmeleri,
+gündem haberleri ve özel dosyalar.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?economy">
+
+<div class="cardContent">
+
+<h2>💰 Ekonomi</h2>
+
+<p>
+
+Altın, döviz, borsa, emeklilik,
+asgari ücret ve finans haberleri.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?sports">
+
+<div class="cardContent">
+
+<h2>⚽ Spor</h2>
+
+<p>
+
+Futbol, basketbol,
+transfer haberleri,
+maç sonuçları ve analizler.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?technology">
+
+<div class="cardContent">
+
+<h2>💻 Teknoloji</h2>
+
+<p>
+
+Yapay zekâ,
+mobil,
+otomobil,
+uzay,
+bilim ve teknoloji haberleri.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?world">
+
+<div class="cardContent">
+
+<h2>🌍 Dünya</h2>
+
+<p>
+
+Dünya gündemi,
+uluslararası gelişmeler
+ve sıcak haberler.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?hospital">
+
+<div class="cardContent">
+
+<h2>🏥 Sağlık</h2>
+
+<p>
+
+Sağlık,
+beslenme,
+yaşam,
+tıp ve uzman görüşleri.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?camera">
+
+<div class="cardContent">
+
+<h2>📸 Foto Galeri</h2>
+
+<p>
+
+En dikkat çeken fotoğraflar
+ve özel galeriler.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?video">
+
+<div class="cardContent">
+
+<h2>🎥 Video Haber</h2>
+
+<p>
+
+Video haberler,
+canlı yayınlar
+ve özel röportajlar.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?forest">
+
+<div class="cardContent">
+
+<h2>📍 Cide Haberleri</h2>
+
+<p>
+
+Cide,
+Kastamonu ve Batı Karadeniz'den
+yerel gelişmeler.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?city">
+
+<div class="cardContent">
+
+<h2>🏙️ Yerel Haberler</h2>
+
+<p>
+
+81 il,
+973 ilçe,
+mahalle ve köylerden
+gelen haberler.
+
+</p>
+
+</div>
+
+</div>
+
+</section><section style="max-width:1400px;margin:auto;padding:20px 15px;">
+
+<h2 style="
+margin-bottom:25px;
+font-size:30px;
+color:#d40000;
+font-weight:700;
+">
+
+Son Haberler
+
+</h2>
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:20px;
+">
+
+<div class="card">
+
+<img src="https://picsum.photos/600/350?breaking">
+
+<div class="cardContent">
+
+<h2>
+Son Dakika Gelişmesi
+</h2>
+
+<p>
+
+Türkiye gündeminde yaşanan son gelişmeler
+anbean Digital Gündem'de.
+
+</p>
+
+<a href="#" style="
+display:inline-block;
+margin-top:15px;
+background:#d40000;
+color:#fff;
+padding:10px 18px;
+border-radius:30px;
+">
+
+Haberi Oku
+
+</a>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/600/350?citynews">
+
+<div class="cardContent">
+
+<h2>
+
+Yerel Haberler
+
+</h2>
+
+<p>
+
+81 il,
+973 ilçe,
+köy ve mahallelerden
+gelen gelişmeler.
+
+</p>
+
+<a href="#" style="
+display:inline-block;
+margin-top:15px;
+background:#111;
+color:#fff;
+padding:10px 18px;
+border-radius:30px;
+">
+
+İncele
+
+</a>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<img src="https://picsum.photos/600/350?economics">
+
+<div class="cardContent">
+
+<h2>
+
+Ekonomi Gündemi
+
+</h2>
+
+<p>
+
+Altın,
+döviz,
+borsa,
+kripto para
+ve finans haberleri.
+
+</p>
+
+<a href="#" style="
+display:inline-block;
+margin-top:15px;
+background:#008f4c;
+color:white;
+padding:10px 18px;
+border-radius:30px;
+">
+
+Detaylar
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section style="
+background:white;
+padding:40px 20px;
+margin-top:40px;
+">
+
+<div style="
+max-width:1400px;
+margin:auto;
+">
+
+<h2 style="
+font-size:32px;
+margin-bottom:25px;
+color:#d40000;
+">
+
+Editörün Seçtikleri
+
+</h2>
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+">
+
+<div class="sideCard">
+
+<h3>
+🇹🇷 Türkiye
+</h3>
+
+<p>
+
+Türkiye'nin en çok okunan haberleri.
+
+</p>
+
+</div>
+
+<div class="sideCard">
+
+<h3>
+🌍 Dünya
+</h3>
+
+<p>
+
+Uluslararası gelişmeler
+tek sayfada.
+
+</p>
+
+</div>
+
+<div class="sideCard">
+
+<h3>
+⚽ Spor
+</h3>
+
+<p>
+
+Transferler,
+puan durumu,
+maç sonuçları.
+
+</p>
+
+</div>
+
+<div class="sideCard">
+
+<h3>
+🤖 Yapay Zekâ
+</h3>
+
+<p>
+
+AI dünyasındaki
+en yeni gelişmeler.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section><section style="max-width:1400px;margin:40px auto;padding:0 15px;">
+
+<h2 style="
+font-size:30px;
+color:#d40000;
+margin-bottom:25px;
+">
+
+Canlı Piyasalar
+
+</h2>
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+">
+
+<div class="sideCard">
+<h3>🥇 Gram Altın</h3>
+<h2 id="goldPrice">Yükleniyor...</h2>
+</div>
+
+<div class="sideCard">
+<h3>💵 Dolar</h3>
+<h2 id="usdPrice">Yükleniyor...</h2>
+</div>
+
+<div class="sideCard">
+<h3>💶 Euro</h3>
+<h2 id="eurPrice">Yükleniyor...</h2>
+</div>
+
+<div class="sideCard">
+<h3>🪙 Bitcoin</h3>
+<h2 id="btcPrice">Yükleniyor...</h2>
+</div>
+
+</div>
+
+</section>
+
+<section style="max-width:1400px;margin:auto;padding:20px 15px;">
+
+<div style="
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:25px;
+">
+
+<div>
+
+<h2 style="
+color:#d40000;
+margin-bottom:20px;
+">
+
+📢 Reklam Alanı
+
+</h2>
+
+<div style="
+height:250px;
+background:#ececec;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:30px;
+font-weight:bold;
+border-radius:12px;
+">
+
+970 × 250 REKLAM
+
+</div>
+
+</div>
+
+<div>
+
+<h2 style="
+color:#d40000;
+margin-bottom:20px;
+">
+
+Hava Durumu
+
+</h2>
+
+<div class="sideCard">
+
+<h3>🌤 İstanbul</h3>
+
+<p>26°C</p>
+
+<hr>
+
+<h3>🌦 Cide</h3>
+
+<p>24°C</p>
+
+<hr>
+
+<h3>🌧 Kastamonu</h3>
+
+<p>22°C</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section style="
+background:#fff;
+padding:40px 20px;
+margin-top:40px;
+">
+
+<div style="
+max-width:1400px;
+margin:auto;
+">
+
+<h2 style="
+color:#d40000;
+margin-bottom:25px;
+">
+
+Bizi Takip Edin
+
+</h2>
+
+<div style="
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+">
+
+<a href="#" class="sideCard">📘 Facebook</a>
+
+<a href="#" class="sideCard">📷 Instagram</a>
+
+<a href="#" class="sideCard">▶ YouTube</a>
+
+<a href="#" class="sideCard">❌ X</a>
+
+<a href="#" class="sideCard">🎵 TikTok</a>
+
+<a href="#" class="sideCard">💬 WhatsApp Kanalı</a>
+
+</div>
+
+</div>
+
+</section><footer>
+
+<div style="max-width:1400px;margin:auto;">
+
+<div style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:30px;
+text-align:left;
+">
+
+<div>
+
+<h2 style="margin-bottom:15px;color:#fff;">
+Digital Gündem
+</h2>
+
+<p>
+
+Türkiye'nin dijital haber platformu.
+
+Tarafsız bakar, doğruyu yayınlar.
+
+</p>
+
+</div>
+
+<div>
+
+<h3 style="margin-bottom:15px;">
+Kategoriler
+</h3>
+
+<p>Son Dakika</p>
+<p>Türkiye</p>
+<p>Ekonomi</p>
+<p>Spor</p>
+<p>Teknoloji</p>
+<p>Dünya</p>
+<p>Sağlık</p>
+<p>Cide Haberleri</p>
+
+</div>
+
+<div>
+
+<h3 style="margin-bottom:15px;">
+Kurumsal
+</h3>
+
+<p>Hakkımızda</p>
+<p>İletişim</p>
+<p>KVKK</p>
+<p>Gizlilik Politikası</p>
+<p>Kullanım Şartları</p>
+<p>Reklam</p>
+
+</div>
+
+<div>
+
+<h3 style="margin-bottom:15px;">
+İletişim
+</h3>
+
+<p>📧 info@digitalgundem.com</p>
+
+<p>🌍 www.digitalgundem.com</p>
+
+<p>📱 WhatsApp İhbar Hattı</p>
+
+</div>
+
+</div>
+
+<hr style="
+margin:35px 0;
+border:0;
+border-top:1px solid rgba(255,255,255,.2);
+">
+
+<div style="
+display:flex;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:15px;
+">
+
+<div>
+
+© 2026 Digital Gündem
+Tüm Hakları Saklıdır.
+
+</div>
+
+<div id="clock">
+
+Saat Yükleniyor...
+
+</div>
+
+</div>
+
+</div>
+
+</footer>
+
+<script>
+
+function saatGoster(){
+
+const simdi=new Date();
+
+const saat=simdi.toLocaleString("tr-TR");
+
+document.getElementById("clock").innerHTML=saat;
+
+}
+
+setInterval(saatGoster,1000);
+
+saatGoster();
+
+</script>// Yukarı Çık Butonu
+const yukariButon = document.createElement("button");
+
+yukariButon.innerHTML = "⬆";
+
+yukariButon.style.position = "fixed";
+yukariButon.style.bottom = "20px";
+yukariButon.style.right = "20px";
+yukariButon.style.width = "50px";
+yukariButon.style.height = "50px";
+yukariButon.style.border = "none";
+yukariButon.style.borderRadius = "50%";
+yukariButon.style.background = "#d40000";
+yukariButon.style.color = "#fff";
+yukariButon.style.fontSize = "22px";
+yukariButon.style.cursor = "pointer";
+yukariButon.style.display = "none";
+yukariButon.style.zIndex = "99999";
+
+document.body.appendChild(yukariButon);
+
+window.addEventListener("scroll", () => {
+
+if(window.scrollY > 300){
+
+yukariButon.style.display="block";
+
+}else{
+
+yukariButon.style.display="none";
+
+}
+
+});
+
+yukariButon.onclick=function(){
+
+window.scrollTo({
+
+top:0,
+
+behavior:"smooth"
+
+});
+
+};
+
+// Haber Arama
+const haberKutulari=document.querySelectorAll(".card");
+
+const arama=document.querySelector(".search input");
+
+if(arama){
+
+arama.addEventListener("keyup",function(){
+
+const kelime=this.value.toLowerCase();
+
+haberKutulari.forEach(function(kart){
+
+kart.style.display=
+
+kart.innerText.toLowerCase().includes(kelime)
+
+?
+
+"block"
+
+:
+
+"none";
+
+});
+
+});
+
+}
+
+// Sayfa Animasyonu
+
+const kutular=document.querySelectorAll(".card,.sideCard,.mainNews");
+
+const gozlem=new IntersectionObserver((entries)=>{
+
+entries.forEach(entry=>{
+
+if(entry.isIntersecting){
+
+entry.target.style.opacity="1";
+
+entry.target.style.transform="translateY(0)";
+
+}
+
+});
+
+});
+
+kutular.forEach(k=>{
+
+k.style.opacity="0";
+
+k.style.transform="translateY(40px)";
+
+k.style.transition=".6s";
+
+gozlem.observe(k);
+
+});// Karanlık Mod
+const temaButonu = document.createElement("button");
+
+temaButonu.innerHTML = "🌙";
+
+temaButonu.style.position = "fixed";
+temaButonu.style.bottom = "80px";
+temaButonu.style.right = "20px";
+temaButonu.style.width = "50px";
+temaButonu.style.height = "50px";
+temaButonu.style.border = "none";
+temaButonu.style.borderRadius = "50%";
+temaButonu.style.background = "#111";
+temaButonu.style.color = "#fff";
+temaButonu.style.fontSize = "20px";
+temaButonu.style.cursor = "pointer";
+temaButonu.style.zIndex = "99999";
+
+document.body.appendChild(temaButonu);
+
+let koyuMod = false;
+
+temaButonu.onclick = function () {
+
+    koyuMod = !koyuMod;
+
+    if (koyuMod) {
+
+        document.body.style.background = "#111";
+        document.body.style.color = "#fff";
+
+        document.querySelectorAll(".card,.sideCard,.mainNews,header")
+        .forEach(function(k){
+
+            k.style.background="#1f1f1f";
+            k.style.color="#fff";
+
+        });
+
+        temaButonu.innerHTML="☀";
+
+    } else {
+
+        document.body.style.background="#f2f4f8";
+        document.body.style.color="#222";
+
+        document.querySelectorAll(".card,.sideCard,.mainNews,header")
+        .forEach(function(k){
+
+            k.style.background="#fff";
+            k.style.color="#222";
+
+        });
+
+        temaButonu.innerHTML="🌙";
+
+    }
+
+};
+
+// Basit Mobil Menü
+const menu = document.querySelector("nav");
+
+const menuButon = document.createElement("button");
+
+menuButon.innerHTML="☰";
+
+menuButon.style.display="none";
+menuButon.style.fontSize="28px";
+menuButon.style.background="transparent";
+menuButon.style.border="0";
+menuButon.style.cursor="pointer";
+
+document.querySelector(".header").prepend(menuButon);
+
+function mobilKontrol(){
+
+    if(window.innerWidth<900){
+
+        menu.style.display="none";
+        menuButon.style.display="block";
+
+    }else{
+
+        menu.style.display="block";
+        menuButon.style.display="none";
+
+    }
+
+}
+
+mobilKontrol();
+
+window.onresize=mobilKontrol;
+
+menuButon.onclick=function(){
+
+    if(menu.style.display=="none"){
+
+        menu.style.display="block";
+
+    }else{
+
+        menu.style.display="none";
+
+    }
+
+};
+
+// Telif yılı
+const yil = new Date().getFullYear();
+
+document.querySelector("footer div").innerHTML =
+document.querySelector("footer div").innerHTML.replace("2026",yil);
+
+console.log("Digital Gündem hazır.");</script>
+
+</body>
+
+</html>
+  
