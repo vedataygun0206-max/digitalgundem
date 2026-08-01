@@ -1,4 +1,4 @@
-Commit
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -418,7 +418,43 @@ Digital <span>Gündem</span>
 <div class="slogan">
 Tarafsız bakar, doğruyu yayınlar.
 </div>
+<section id="rss-haberler">
+<h2>📰 Son Dakika Haberleri</h2>
 
+<div id="haberler">
+Yükleniyor...
+</div>
+</section>
+
+<script>
+async function haberleriGetir() {
+  try {
+    const res = await fetch("/worker");
+    const xml = await res.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, "text/xml");
+
+    const items = [...doc.querySelectorAll("item")].slice(0,10);
+
+    document.getElementById("haberler").innerHTML =
+      items.map(item => `
+        <div class="haber">
+          <h3>${item.querySelector("title").textContent}</h3>
+          <a href="${item.querySelector("link").textContent}" target="_blank">
+            Haberi Oku
+          </a>
+        </div>
+      `).join("");
+
+  } catch(e) {
+    document.getElementById("haberler").innerHTML =
+      "Haberler yüklenemedi.";
+  }
+}
+
+haberleriGetir();
+</script>
 </div>
 
 <nav>
