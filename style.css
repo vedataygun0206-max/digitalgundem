@@ -1,1 +1,165 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins',sans-serif;
+}
 
+body{
+background:#f2f4f8;
+color:#222;
+line-height:1.6;
+}
+
+a{
+text-decoration:none;
+color:inherit;
+}
+
+.topbar{
+background:#d40000;
+color:#fff;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 25px;
+}
+
+.logo{
+font-size:30px;
+font-weight:700;
+}
+
+.logo span{
+color:#ffd700;
+}
+
+.slogan{
+font-size:14px;
+opacity:.9;
+}
+
+nav{
+background:#111;
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+nav a{
+color:#fff;
+padding:15px 18px;
+transition:.3s;
+}
+
+nav a:hover{
+background:#d40000;
+}
+
+.breaking{
+background:#ffd400;
+padding:10px;
+font-weight:bold;
+overflow:hidden;
+}
+
+.search{
+padding:20px;
+display:flex;
+gap:10px;
+justify-content:center;
+background:#fff;
+}
+
+.search input{
+width:70%;
+padding:12px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+.search button{
+background:#d40000;
+color:#fff;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+}
+
+#rss-haberler{
+max-width:1200px;
+margin:30px auto;
+padding:20px;
+}
+
+#rss-haberler h2{
+margin-bottom:20px;
+color:#d40000;
+}
+
+#haberler{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:20px;
+}
+
+.haber{
+background:#fff;
+padding:20px;
+border-radius:12px;
+box-shadow:0 4px 15px rgba(0,0,0,.08);
+transition:.3s;
+}
+
+.haber:hover{
+transform:translateY(-5px);
+}
+
+.haber h3{
+font-size:18px;
+margin-bottom:12px;
+}
+
+.haber a{
+display:inline-block;
+margin-top:10px;
+background:#d40000;
+color:#fff;
+padding:10px 18px;
+border-radius:8px;
+}
+
+footer{
+background:#111;
+color:#fff;
+padding:40px;
+text-align:center;
+margin-top:40px;
+}
+
+@media(max-width:768px){
+
+.topbar{
+flex-direction:column;
+text-align:center;
+}
+
+.search{
+flex-direction:column;
+}
+
+.search input{
+width:100%;
+}
+
+nav{
+flex-direction:column;
+}
+
+nav a{
+border-bottom:1px solid #333;
+text-align:center;
+}
+
+}
