@@ -463,7 +463,7 @@ Yükleniyor...
 <script>
 async function haberleriGetir() {
   try {
-    const res = await fetch("/worker");
+    const res = await fetch("https://digitalgundem.vedataygun0206.workers.dev/");
     const xml = await res.text();
 
     const parser = new DOMParser();
