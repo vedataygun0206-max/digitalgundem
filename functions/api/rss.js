@@ -2,7 +2,7 @@ export async function onRequestGet() {
   const rssUrl = "https://www.trthaber.com/sondakika_articles.rss";
 
   try {
-    const response = await fetch(rssUrl);
+    const response = await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://www.trthaber.com/sondakika_articles.rss"));
     const xml = await response.text();
 
     return new Response(xml, {
